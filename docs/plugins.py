@@ -70,8 +70,7 @@ def reinstate_code_titles(markdown: str) -> str:
 
 def add_version(markdown: str, page: Page) -> str:
     if page.abs_url == '/':
-        version_ref = os.getenv('GITHUB_REF')
-        if version_ref:
+        if version_ref := os.getenv('GITHUB_REF'):
             version = re.sub('^refs/tags/', '', version_ref.lower())
             version_str = f'Documentation for version: **{version}**'
         else:

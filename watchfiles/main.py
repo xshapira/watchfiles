@@ -114,14 +114,12 @@ def watch(
             elif raw_changes == 'signal':
                 if raise_interrupt:
                     raise KeyboardInterrupt
-                else:
-                    logger.warning('KeyboardInterrupt caught, stopping watch')
-                    return
+                logger.warning('KeyboardInterrupt caught, stopping watch')
+                return
             elif raw_changes == 'stop':
                 return
             else:
-                changes = _prep_changes(raw_changes, watch_filter)
-                if changes:
+                if changes := _prep_changes(raw_changes, watch_filter):
                     _log_changes(changes)
                     yield changes
 
@@ -213,11 +211,7 @@ async def awatch(  # noqa C901
             DeprecationWarning,
         )
 
-    if stop_event is None:
-        stop_event_: 'AnyEvent' = anyio.Event()
-    else:
-        stop_event_ = stop_event
-
+    stop_event_ = anyio.Event() if stop_event is None else stop_event
     force_polling = _default_force_pulling(force_polling)
     with RustNotify([str(p) for p in paths], debug, force_polling, poll_delay_ms) as watcher:
         timeout = _calc_async_timeout(rust_timeout)
@@ -244,8 +238,7 @@ async def awatch(  # noqa C901
                 # in theory the watch thread should never get a signal
                 raise RuntimeError('watch thread unexpectedly received a signal')
             else:
-                changes = _prep_changes(raw_changes, watch_filter)
-                if changes:
+                if changes := _prep_changes(raw_changes, watch_filter):
                     _log_changes(changes)
                     yield changes
 
@@ -275,10 +268,7 @@ def _calc_async_timeout(timeout: Optional[int]) -> int:
     see https://github.com/samuelcolvin/watchfiles/issues/110
     """
     if timeout is None:
-        if sys.platform == 'win32':
-            return 1_000
-        else:
-            return 5_000
+        return 1_000 if sys.platform == 'win32' else 5_000
     else:
         return timeout
 

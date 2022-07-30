@@ -147,7 +147,7 @@ def test_watch_multiple(tmp_path: Path):
     # can compare directly since on macos creating the foo and bar directories is included in changes
     assert (1, str(foo / 'foo.txt')) in changes
     assert (1, str(bar / 'foo.txt')) in changes
-    assert not any('not_included.txt' in p for c, p in changes)
+    assert all('not_included.txt' not in p for c, p in changes)
 
 
 def test_wrong_type_event(test_dir: Path, time_taken):

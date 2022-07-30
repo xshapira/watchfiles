@@ -131,10 +131,7 @@ def test_watch_timeout(mock_rust_notify: 'MockRustType', caplog):
     mock = mock_rust_notify(['timeout', {(1, 'spam.py')}])
 
     caplog.set_level('DEBUG', 'watchfiles')
-    change_list = []
-    for changes in watch('.'):
-        change_list.append(changes)
-
+    change_list = list(watch('.'))
     assert change_list == [{(Change.added, 'spam.py')}]
     assert mock.watch_count == 2
     assert caplog.text == (
@@ -146,10 +143,7 @@ def test_watch_timeout(mock_rust_notify: 'MockRustType', caplog):
 def test_watch_yield_on_timeout(mock_rust_notify: 'MockRustType'):
     mock = mock_rust_notify(['timeout', {(1, 'spam.py')}])
 
-    change_list = []
-    for changes in watch('.', yield_on_timeout=True):
-        change_list.append(changes)
-
+    change_list = list(watch('.', yield_on_timeout=True))
     assert change_list == [set(), {(Change.added, 'spam.py')}]
     assert mock.watch_count == 2
 

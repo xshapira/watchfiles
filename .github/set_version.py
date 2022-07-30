@@ -14,8 +14,7 @@ def main(cargo_path_env_var='CARGO_PATH', version_env_vars=('VERSION', 'GITHUB_R
 
     version = None
     for var in version_env_vars:
-        version_ref = os.getenv(var)
-        if version_ref:
+        if version_ref := os.getenv(var):
             version = re.sub('^refs/tags/v*', '', version_ref.lower())
             break
     if not version:

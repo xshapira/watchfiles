@@ -183,15 +183,15 @@ def build_filter(
     if ignore_paths_str:
         ignore_paths = [Path(p).resolve() for p in ignore_paths_str.split(',')]
 
-    if filter_name == 'default':
-        return DefaultFilter(ignore_paths=ignore_paths), 'DefaultFilter'
-    elif filter_name == 'python':
-        return PythonFilter(ignore_paths=ignore_paths), 'PythonFilter'
-    elif filter_name == 'all':
+    if filter_name == 'all':
         if ignore_paths:
             logger.warning('"--ignore-paths" argument ignored as "all" filter was selected')
         return None, '(no filter)'
 
+    elif filter_name == 'default':
+        return DefaultFilter(ignore_paths=ignore_paths), 'DefaultFilter'
+    elif filter_name == 'python':
+        return PythonFilter(ignore_paths=ignore_paths), 'PythonFilter'
     watch_filter_cls = import_exit(filter_name)
     if isinstance(watch_filter_cls, type) and issubclass(watch_filter_cls, DefaultFilter):
         return watch_filter_cls(ignore_paths=ignore_paths), watch_filter_cls.__name__
@@ -201,6 +201,5 @@ def build_filter(
 
     if isinstance(watch_filter_cls, type) and issubclass(watch_filter_cls, BaseFilter):
         return watch_filter_cls(), watch_filter_cls.__name__
-    else:
-        watch_filter = cast(Callable[[Change, str], bool], watch_filter_cls)
-        return watch_filter, repr(watch_filter_cls)
+    watch_filter = cast(Callable[[Change, str], bool], watch_filter_cls)
+    return watch_filter, repr(watch_filter_cls)
